@@ -11,10 +11,10 @@
 
 本项目使用`Python3.6`,使用技术有: Flask, Flask-SocketIO, Flask-CORS
 
-- `cd`进入到`python`文件夹中
+- `cd`进入到`python`文件夹中
 - 确保系统安装了virtualenv (保护系统Python环境不被污染)
-- 执行`virtualenv env`初始化python virtualenv环境
-- 执行`source env/bin/activate`激活环境 (执行`deactivate`退出环境)
+- 执行`virtualenv env`初始化python virtualenv环境
+- 执行`source env/bin/activate`激活环境 (执行`deactivate`退出环境)
 - 执行`pip install -r requirements.txt`安装所需依赖
 - 执行`./start.sh`运行WebSocket服务 (默认端口5000)
 

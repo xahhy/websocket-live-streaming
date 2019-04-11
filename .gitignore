@@ -1,4 +1,6 @@
 *env
 *.mp4
 *.ts
-
+*.idea
+*.vscode
+__pycache__

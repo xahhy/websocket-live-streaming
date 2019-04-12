@@ -17,8 +17,8 @@ def handle_message(message):
 
 @socketio.on('video')
 def handle_video():
-    with open('../videos/test.webm', 'rb') as ts:
-        data = ts.read();
+    with open('../videos/gapless.webm', 'rb') as ts:
+        data = ts.read()
         while True:
             emit('stream', {'data': data}, broadcast=True)
             sleep(6)

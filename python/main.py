@@ -1,3 +1,5 @@
+from time import sleep
+
 from flask import Flask, render_template
 from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
@@ -16,8 +18,10 @@ def handle_message(message):
 @socketio.on('video')
 def handle_video():
     with open('../videos/test.webm', 'rb') as ts:
-        for i in range(4):
-            emit('stream', {'data': ts.read()}, broadcast=True)
+        data = ts.read();
+        while True:
+            emit('stream', {'data': data}, broadcast=True)
+            sleep(6)
 
 
 if __name__ == '__main__':

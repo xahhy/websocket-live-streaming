@@ -7,90 +7,13 @@
   <title>WebSocket Streaming</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script type="text/javascript" src="./socket.io.dev.js"></script>
-  <link rel="stylesheet" href="./index.css">
+  <link rel="stylesheet" href="src/index.css">
 </head>
 
 <body>
   <video id="video" controls></video>
   <button id="triggerBtn">Start Streaming!</button>
-  
-  <script type="text/javascript" charset="utf-8">
-    var PORT = 5000;
-    var DOMAIN = "127.0.0.1"
-    var socket;
-    var queue = [];
-
-    var video = document.querySelector('video');
-    var mimeCodec = 'video/webm; codecs="vorbis,vp8"';
-    if (MediaSource.isTypeSupported(mimeCodec)) {
-
-      // Create Media Source
-      var mediaSource = new MediaSource(); // mediaSource.readyState === 'closed'
-      video.src = URL.createObjectURL(mediaSource);
-      mediaSource.addEventListener('sourceopen', sourceOpen);
-    } else {
-      console.error("Unsupported media format");
-    }
-
-    function sourceOpen(_) {
-      console.log("init socketio");
-      initSocketIO();
-      var mediaSource = this;
-      var buffer = mediaSource.addSourceBuffer(mimeCodec);
-      console.log('default source buffer mode:', buffer.mode);
-      buffer.mode = 'sequence';
-      console.log('set source buffer mode to "sequrence"');
-      socket.on('stream', function (data) {
-        console.log("Receive stream data");
-        if (queue.length > 0 || buffer.updating) {
-          queue.push(data.data);
-        } else {
-          buffer.appendBuffer(data.data);
-        }
-      });
-      buffer.addEventListener('updateend', function (_) {
-        if (!buffer.updating && mediaSource.readyState === 'open') {
-          //mediaSource.endOfStream();
-          //buffer.appendBuffer(queue.shift());
-          //video.play();
-        }
-      });
-      buffer.addEventListener('update', function (e) {
-        if (queue.length > 0 && !buffer.updating) {
-          buffer.appendBuffer(queue.shift());
-        }
-      });
-      buffer.addEventListener('updatestart', function (e) {
-        console.log('updatestart: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('update', function (e) {
-        console.log('update: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('updateend', function (e) {
-        console.log('updateend: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('error', function (e) {
-        console.log('error: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('abort', function (e) {
-        console.log('abort: ' + mediaSource.readyState);
-      });
-
-    }
-
-    function initSocketIO() {
-      socket = io.connect('http://' + DOMAIN + ':' + PORT);
-      socket.on('connect', function () {
-        socket.emit('message', {
-          data: 'I\'m connected!'
-        });
-      });
-    }
-
-    document.getElementById("triggerBtn").addEventListener('click', e => {
-      socket.emit("video");
-    })
-  </script>
+  <script src="src/index.js"></script>
 </body>
 
 </html>

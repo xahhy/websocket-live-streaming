@@ -1,0 +1,28 @@
+button {
+  background-color: hsl(265, 100%, 65%);
+  border-radius: 3px;
+  border-width: 2px;
+  color: hsl(0, 0%, 100%);
+  display: inline-block;
+  font-family: "Work Sans";
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  margin: 0px 4px;
+  padding: 5px 15px;
+  text-align: center;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 16px;
+  cursor: pointer;
+  margin: 16px auto;
+}
+
+video {
+  width: 500px;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
+/*# sourceMappingURL=/src.f41506f2.css.map */

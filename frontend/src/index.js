@@ -1,6 +1,8 @@
+import io from "socket.io-client";
+
 document.addEventListener('DOMContentLoaded', function () {
-  var PORT = 5000;
-  var DOMAIN = "127.0.0.1"
+  const PORT = 5000;
+  const DOMAIN = "127.0.0.1"
   var socket;
   var segments = [];
   var buffer;
@@ -15,10 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function getTrackId(data) {
     return data[47]
   }
-
-  // function getTypeBytrackId(id) {
-  // return this.audioTrackId === id ? AUDIO : VIDEO
-  // }
 
   function rawDataToSegment(rawData) {
     const view = RawDataToUint8Array(rawData)
@@ -66,18 +64,9 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log("Receive stream data");
       procArrayBuffer(data.data);
     });
-    buffer.addEventListener('updateend', function (_) {
-      if (!buffer.updating && mediaSource.readyState === 'open') {
-        //mediaSource.endOfStream();
-        //buffer.appendBuffer(segments.shift());
-        //video.play();
-      }
+    buffer.addEventListener('updateend', function (e) {
+      console.log('updateend: ' + mediaSource.readyState);
     });
-    // buffer.addEventListener('update', function (e) {
-    //   if (segments.length > 0 && !buffer.updating) {
-    //     buffer.appendBuffer(segments.shift());
-    //   }
-    // });
     buffer.addEventListener('updatestart', function (e) {
       console.log('updatestart: ' + mediaSource.readyState);
     });

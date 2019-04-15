@@ -9656,10 +9656,36 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./url":"node_modules/socket.io-client/lib/url.js","socket.io-parser":"node_modules/socket.io-parser/index.js","./manager":"node_modules/socket.io-client/lib/manager.js","debug":"node_modules/socket.io-client/node_modules/debug/src/browser.js","./socket":"node_modules/socket.io-client/lib/socket.js"}],"src/index.js":[function(require,module,exports) {
+},{"./url":"node_modules/socket.io-client/lib/url.js","socket.io-parser":"node_modules/socket.io-parser/index.js","./manager":"node_modules/socket.io-client/lib/manager.js","debug":"node_modules/socket.io-client/node_modules/debug/src/browser.js","./socket":"node_modules/socket.io-client/lib/socket.js"}],"src/utils/common.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addClass = addClass;
+exports.removeClass = removeClass;
+
+function addClass(dom, className) {
+  var classList = dom.classList;
+
+  if (!classList.contains(className)) {
+    classList.add(className);
+  }
+}
+
+function removeClass(dom, className) {
+  var classList = dom.classList;
+
+  if (classList.contains(className)) {
+    classList.remove(className);
+  }
+}
+},{}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 var _socket = _interopRequireDefault(require("socket.io-client"));
+
+var _common = require("./utils/common");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9669,6 +9695,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var socket;
   var segments = [];
   var buffer;
+  var DisconnectBtn = document.getElementById('disconnectBtn');
+  var ConnectBtn = document.getElementById('connectBtn');
+  var SocketStatus = document.querySelector('.socket-status');
 
   function RawDataToUint8Array(rawData) {
     // 12,4 = mfhd;20,4 slice - segment.id;36,4 = tfhd;44,4 slice - track.id;64,4 = tfdt
@@ -9703,8 +9732,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  var video = document.querySelector('video');
-  var mimeCodec = 'video/webm; codecs="vorbis,vp8"';
+  var video = document.querySelector('video'); // var mimeCodec = 'video/webm; codecs="vorbis,vp8"';
+
+  var mimeCodec = 'video/mp4;codecs="avc1.42E01E,mp4a.40.2"';
 
   if (MediaSource.isTypeSupported(mimeCodec)) {
     // Create Media Source
@@ -9724,10 +9754,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('default source buffer mode:', buffer.mode);
     buffer.mode = 'sequence';
     console.log('set source buffer mode to "sequrence"');
-    socket.on('stream', function (data) {
-      console.log("Receive stream data");
-      procArrayBuffer(data.data);
-    });
     buffer.addEventListener('updateend', function (e) {
       console.log('updateend: ' + mediaSource.readyState);
     });
@@ -9749,11 +9775,25 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function initSocketIO() {
-    socket = _socket.default.connect('http://' + DOMAIN + ':' + PORT);
+    socket = _socket.default.connect('http://' + DOMAIN + ':' + PORT, {
+      rememberTransport: false,
+      reconnection: false // transports: ['websocket']
+
+    });
     socket.on('connect', function () {
       socket.emit('message', {
         data: 'I\'m connected!'
       });
+      (0, _common.addClass)(SocketStatus, 'connected');
+      (0, _common.removeClass)(SocketStatus, 'disconnected');
+    });
+    socket.on('disconnect', function () {
+      (0, _common.addClass)(SocketStatus, 'disconnected');
+      (0, _common.removeClass)(SocketStatus, 'connected');
+    });
+    socket.on('stream', function (data) {
+      console.log("Receive stream data", data);
+      procArrayBuffer(data.data);
     });
   }
 
@@ -9761,8 +9801,14 @@ document.addEventListener('DOMContentLoaded', function () {
     socket.emit("video");
     video.play();
   });
+  DisconnectBtn.addEventListener('click', function (e) {
+    socket.disconnect();
+  });
+  ConnectBtn.addEventListener('click', function (e) {
+    socket.connect();
+  });
 });
-},{"socket.io-client":"node_modules/socket.io-client/lib/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"socket.io-client":"node_modules/socket.io-client/lib/index.js","./utils/common":"src/utils/common.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -9790,7 +9836,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53302" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57354" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

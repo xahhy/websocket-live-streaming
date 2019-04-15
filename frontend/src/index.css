@@ -11,7 +11,6 @@ button {
   margin: 0px 4px;
   padding: 5px 15px;
   text-align: center;
-  text-transform: uppercase;
   display: block;
   margin-top: 16px;
   cursor: pointer;
@@ -23,4 +22,42 @@ video {
   height: auto;
   display: block;
   margin: auto;
+}
+
+:root {
+  --online-color: rgb(22, 211, 69);
+  --offline-color: rgb(190, 48, 48);
+}
+
+.socket-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.socket-status {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+}
+
+.socket-status.connected {
+  background-color: var(--online-color);
+}
+
+.socket-status.disconnected {
+  background-color: var(--offline-color);
+}
+
+#connectBtn {
+  background-color: var(--online-color);
+}
+
+#disconnectBtn {
+  background-color: var(--offline-color);
+}
+
+.socket-container>* {
+  margin: 0 8px 0;
+
 }

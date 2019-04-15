@@ -1,4 +1,8 @@
 import io from "socket.io-client";
+import {
+  addClass,
+  removeClass
+} from './utils/common';
 
 document.addEventListener('DOMContentLoaded', function () {
   const PORT = 5000;
@@ -6,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var socket;
   var segments = [];
   var buffer;
+  var DisconnectBtn = document.getElementById('disconnectBtn');
+  var ConnectBtn = document.getElementById('connectBtn');
+  var SocketStatus = document.querySelector('.socket-status');
 
   function RawDataToUint8Array(rawData) {
     // 12,4 = mfhd;20,4 slice - segment.id;36,4 = tfhd;44,4 slice - track.id;64,4 = tfdt
@@ -42,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   var video = document.querySelector('video');
-  var mimeCodec = 'video/webm; codecs="vorbis,vp8"';
+  // var mimeCodec = 'video/webm; codecs="vorbis,vp8"';
+  const mimeCodec = 'video/mp4;codecs="avc1.42E01E,mp4a.40.2"';
   if (MediaSource.isTypeSupported(mimeCodec)) {
     // Create Media Source
     var mediaSource = new MediaSource(); // mediaSource.readyState === 'closed'
@@ -60,10 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('default source buffer mode:', buffer.mode);
     buffer.mode = 'sequence';
     console.log('set source buffer mode to "sequrence"');
-    socket.on('stream', function (data) {
-      console.log("Receive stream data");
-      procArrayBuffer(data.data);
-    });
+
     buffer.addEventListener('updateend', function (e) {
       console.log('updateend: ' + mediaSource.readyState);
     });
@@ -86,16 +91,39 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function initSocketIO() {
-    socket = io.connect('http://' + DOMAIN + ':' + PORT);
+    socket = io.connect('http://' + DOMAIN + ':' + PORT, {
+      rememberTransport: false,
+      reconnection: false
+      // transports: ['websocket']
+    });
     socket.on('connect', function () {
       socket.emit('message', {
         data: 'I\'m connected!'
       });
+      addClass(SocketStatus, 'connected')
+      removeClass(SocketStatus, 'disconnected');
+    });
+
+    socket.on('disconnect', function () {
+      addClass(SocketStatus, 'disconnected')
+      removeClass(SocketStatus, 'connected');
+    })
+    socket.on('stream', function (data) {
+      console.log("Receive stream data", data);
+      procArrayBuffer(data.data);
     });
   }
 
   document.getElementById("triggerBtn").addEventListener('click', e => {
     socket.emit("video");
     video.play();
+  })
+
+  DisconnectBtn.addEventListener('click', e => {
+    socket.disconnect();
+  })
+
+  ConnectBtn.addEventListener('click', e => {
+    socket.connect();
   })
 })
